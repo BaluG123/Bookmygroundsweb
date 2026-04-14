@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookMyGrounds Web</title>
+    <meta
+      name="description"
+      content="BookMyGrounds web app for public discovery, customer bookings, and admin operations."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div class="hero-top">
+          <div class="brand">
+            <div class="brand-mark">BG</div>
+            <div>
+              <p class="eyebrow">BookMyGrounds Web</p>
+              <h1>Discovery, booking, payouts, slots, and ops in one place.</h1>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button id="refreshAllBtn" class="ghost-btn" type="button">Refresh</button>
+            <button id="heroAuthBtn" class="primary-btn" type="button">Account</button>
+          </div>
+        </div>
+
+        <div class="hero-band">
+          <div class="hero-copy">
+            <p class="eyebrow">LIVE API</p>
+            <p>
+              This website uses the same backend endpoints as the mobile app. Public users can browse
+              grounds, customers can book and pay, and admins can manage grounds, pricing, slots,
+              bookings, and payout settings.
+            </p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card">
+              <span id="heroGroundCount">0</span>
+              <p>Public grounds</p>
+            </div>
+            <div class="stat-card">
+              <span id="heroFavoriteCount">0</span>
+              <p>Favorites</p>
+            </div>
+            <div class="stat-card">
+              <span id="heroBookingCount">0</span>
+              <p>Bookings</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tabbar">
+        <button class="tab active" data-view="discover" type="button">Discover</button>
+        <button class="tab" data-view="account" type="button">Account</button>
+        <button class="tab" data-view="customer" type="button">Customer</button>
+        <button class="tab" data-view="admin" type="button">Admin</button>
+      </nav>
+
+      <main>
+        <section class="view active" data-view-panel="discover">
+          <div class="section-grid discover-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">PUBLIC SEARCH</p>
+                  <h2>Explore Grounds</h2>
+                </div>
+                <select id="discoverOrdering" class="input">
+                  <option value="-avg_rating">Top rated</option>
+                  <option value="-created_at">Newest</option>
+                  <option value="name">Name</option>
+                  <option value="city">City</option>
+                </select>
+              </div>
+
+              <form id="discoverSearchForm" class="inline-form">
+                <input id="discoverSearch" class="input" type="search" placeholder="Search by name, city, address" />
+                <input id="discoverCity" class="input" type="text" placeholder="Filter city" />
+                <button class="primary-btn" type="submit">Search</button>
+              </form>
+
+              <div id="discoverGrounds" class="list-stack"></div>
+              <p id="discoverStatus" class="status-line"></p>
+            </section>
+
+            <section class="panel">
+              <div id="discoverEmpty" class="empty-block">
+                <p class="eyebrow">DETAIL</p>
+                <h2>Select a ground</h2>
+                <p>Ground details, reviews, pricing, slots, and quick booking controls show here.</p>
+              </div>
+
+              <div id="discoverDetail" class="hidden">
+                <div id="discoverHero" class="detail-hero"></div>
+                <div class="panel-section">
+                  <div class="action-row">
+                    <button id="discoverFavoriteBtn" class="ghost-btn" type="button">Save Favorite</button>
+                    <button id="discoverMapBtn" class="ghost-btn" type="button">Open Maps</button>
+                  </div>
+                  <div id="discoverMeta" class="pill-row"></div>
+                </div>
+
+                <div class="panel-section">
+                  <h3>About</h3>
+                  <p id="discoverDescription"></p>
+                </div>
+
+                <div class="panel-section two-col">
+                  <div>
+                    <h3>Amenities</h3>
+                    <div id="discoverAmenities" class="pill-row"></div>
+                  </div>
+                  <div>
+                    <h3>Pricing</h3>
+                    <div id="discoverPricing" class="list-stack compact-stack"></div>
+                  </div>
+                </div>
+
+                <div class="panel-section two-col">
+                  <div>
+                    <h3>Rules</h3>
+                    <p id="discoverRules"></p>
+                  </div>
+                  <div>
+                    <h3>Cancellation</h3>
+                    <p id="discoverCancellation"></p>
+                  </div>
+                </div>
+
+                <div class="panel-section">
+                  <div class="panel-header">
+                    <div>
+                      <p class="eyebrow">BOOKING</p>
+                      <h3>Reserve a live slot</h3>
+                    </div>
+                    <input id="discoverDate" class="input narrow" type="date" />
+                  </div>
+                  <div id="discoverSlots" class="slot-grid"></div>
+                  <div id="discoverBookingSummary" class="info-card hidden"></div>
+                  <form id="discoverBookingForm" class="grid-form hidden">
+                    <input id="discoverCustomerName" class="input" type="text" placeholder="Customer name" />
+                    <input id="discoverCustomerPhone" class="input" type="tel" placeholder="Phone number" />
+                    <input id="discoverPlayerCount" class="input" type="number" min="1" value="1" />
+                    <textarea id="discoverSpecialRequests" class="input full-span" rows="3" placeholder="Special requests"></textarea>
+                    <button id="discoverBookingSubmit" class="primary-btn full-span" type="submit">Create Booking</button>
+                  </form>
+                </div>
+
+                <div class="panel-section">
+                  <h3>Reviews</h3>
+                  <div id="discoverReviews" class="list-stack compact-stack"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="account">
+          <div class="section-grid account-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">SESSION</p>
+                  <h2>Authentication</h2>
+                </div>
+              </div>
+
+              <div id="accountGuest">
+                <form id="loginForm" class="grid-form">
+                  <input id="loginEmail" class="input" type="email" placeholder="Email" required />
+                  <input id="loginPassword" class="input" type="password" placeholder="Password" required />
+                  <button class="primary-btn full-span" type="submit">Login</button>
+                </form>
+
+                <details class="details-block">
+                  <summary>Create customer account</summary>
+                  <form id="registerForm" class="grid-form top-gap">
+                    <input id="registerName" class="input" type="text" placeholder="Full name" required />
+                    <input id="registerEmail" class="input" type="email" placeholder="Email" required />
+                    <input id="registerPhone" class="input" type="tel" placeholder="Phone" />
+                    <input id="registerCity" class="input" type="text" placeholder="City" />
+                    <input id="registerPassword" class="input" type="password" placeholder="Password" required />
+                    <input id="registerPasswordConfirm" class="input" type="password" placeholder="Confirm password" required />
+                    <button class="ghost-btn full-span" type="submit">Register</button>
+                  </form>
+                </details>
+              </div>
+
+              <div id="accountUser" class="hidden">
+                <div id="accountProfileCard" class="info-card"></div>
+                <button id="logoutBtn" class="ghost-btn danger top-gap" type="button">Logout</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">PROFILE</p>
+                  <h2>Edit Profile</h2>
+                </div>
+              </div>
+              <form id="profileForm" class="grid-form">
+                <input id="profileName" class="input" type="text" placeholder="Full name" />
+                <input id="profilePhone" class="input" type="tel" placeholder="Phone" />
+                <input id="profileCity" class="input" type="text" placeholder="City" />
+                <input id="profileState" class="input" type="text" placeholder="State" />
+                <button class="primary-btn full-span" type="submit">Update Profile</button>
+              </form>
+
+              <div class="panel-divider"></div>
+
+              <h3>Change Password</h3>
+              <form id="passwordForm" class="grid-form">
+                <input id="passwordOld" class="input" type="password" placeholder="Old password" />
+                <input id="passwordNew" class="input" type="password" placeholder="New password" />
+                <button class="ghost-btn full-span" type="submit">Change Password</button>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">NOTIFICATIONS</p>
+                  <h2>Inbox</h2>
+                </div>
+                <button id="reloadNotificationsBtn" class="ghost-btn" type="button">Reload</button>
+              </div>
+              <div id="notificationsList" class="list-stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="customer">
+          <div class="section-grid customer-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">FAVORITES</p>
+                  <h2>Saved Grounds</h2>
+                </div>
+                <button id="reloadFavoritesBtn" class="ghost-btn" type="button">Reload</button>
+              </div>
+              <div id="favoritesList" class="list-stack"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">BOOKINGS</p>
+                  <h2>My Bookings</h2>
+                </div>
+                <button id="reloadBookingsBtn" class="ghost-btn" type="button">Reload</button>
+              </div>
+              <div id="customerBookingsList" class="list-stack"></div>
+            </section>
+
+            <section class="panel">
+              <div id="customerBookingEmpty" class="empty-block">
+                <p class="eyebrow">BOOKING DETAIL</p>
+                <h2>Select a booking</h2>
+                <p>Booking detail, payment actions, and cancellation controls show here.</p>
+              </div>
+
+              <div id="customerBookingDetail" class="hidden">
+                <div id="customerBookingSummary" class="info-card"></div>
+
+                <div class="panel-section">
+                  <div class="action-row">
+                    <button id="customerCancelBookingBtn" class="ghost-btn danger" type="button">Cancel Booking</button>
+                    <button id="customerReloadBookingBtn" class="ghost-btn" type="button">Refresh Detail</button>
+                  </div>
+                </div>
+
+                <div class="panel-section">
+                  <h3>Payments</h3>
+                  <div class="grid-form">
+                    <input id="customerPaymentAmount" class="input" type="number" min="1" placeholder="Amount" />
+                    <input id="customerPaymentTransaction" class="input" type="text" placeholder="Transaction ID" />
+                    <select id="customerPaymentMethod" class="input">
+                      <option value="online">Online</option>
+                      <option value="upi">UPI</option>
+                      <option value="cash">Cash</option>
+                      <option value="card">Card</option>
+                    </select>
+                    <button id="customerRazorpayBtn" class="primary-btn" type="button">Pay With Razorpay</button>
+                    <button id="customerUpiIntentBtn" class="ghost-btn" type="button">Open UPI Intent</button>
+                    <button id="customerRecordPaymentBtn" class="ghost-btn full-span" type="button">Record Confirmed Payment</button>
+                  </div>
+                  <div id="customerPaymentInfo" class="info-card top-gap hidden"></div>
+                  <div id="customerPaymentHistory" class="list-stack compact-stack top-gap"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="admin">
+          <div class="section-grid admin-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">MY GROUNDS</p>
+                  <h2>Ground Operations</h2>
+                </div>
+                <button id="reloadAdminDataBtn" class="ghost-btn" type="button">Reload</button>
+              </div>
+              <div id="adminGuard" class="empty-block hidden">
+                <p>Login with an admin account to use ground management, pricing, slots, bookings, and payout controls.</p>
+              </div>
+              <div id="adminGroundsList" class="list-stack"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">GROUND FORM</p>
+                  <h2>Create or Edit Ground</h2>
+                </div>
+                <button id="adminResetGroundFormBtn" class="ghost-btn" type="button">New Ground</button>
+              </div>
+
+              <form id="adminGroundForm" class="grid-form">
+                <input id="adminGroundName" class="input" type="text" placeholder="Ground name" required />
+                <textarea id="adminGroundDescription" class="input full-span" rows="3" placeholder="Description"></textarea>
+                <select id="adminGroundType" class="input"></select>
+                <select id="adminSurfaceType" class="input"></select>
+                <input id="adminGroundAddress" class="input full-span" type="text" placeholder="Address" required />
+                <input id="adminGroundCity" class="input" type="text" placeholder="City" required />
+                <input id="adminGroundState" class="input" type="text" placeholder="State" required />
+                <input id="adminGroundPincode" class="input" type="text" placeholder="Pincode" required />
+                <input id="adminGroundLatitude" class="input" type="text" placeholder="Latitude" />
+                <input id="adminGroundLongitude" class="input" type="text" placeholder="Longitude" />
+                <input id="adminGroundOpening" class="input" type="time" />
+                <input id="adminGroundClosing" class="input" type="time" />
+                <input id="adminGroundPlayers" class="input" type="number" min="1" placeholder="Max players" />
+                <textarea id="adminGroundRules" class="input full-span" rows="3" placeholder="Rules"></textarea>
+                <textarea id="adminGroundCancellation" class="input full-span" rows="3" placeholder="Cancellation policy"></textarea>
+                <div class="full-span">
+                  <p class="field-label">Amenities</p>
+                  <div id="adminAmenities" class="checkbox-grid"></div>
+                </div>
+                <button id="adminGroundSubmit" class="primary-btn full-span" type="submit">Save Ground</button>
+              </form>
+
+              <div class="panel-divider"></div>
+
+              <h3>Images</h3>
+              <form id="adminImageForm" class="grid-form">
+                <input id="adminImageFiles" class="input full-span" type="file" multiple accept="image/*" />
+                <input id="adminImageCaption" class="input" type="text" placeholder="Caption" />
+                <label class="check-inline">
+                  <input id="adminImagePrimary" type="checkbox" />
+                  Set first image as primary
+                </label>
+                <button class="ghost-btn full-span" type="submit">Upload Images</button>
+              </form>
+              <div id="adminImagesList" class="list-stack compact-stack top-gap"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">PRICING</p>
+                  <h2>Pricing Plans</h2>
+                </div>
+                <button id="adminResetPricingBtn" class="ghost-btn" type="button">New Plan</button>
+              </div>
+              <form id="adminPricingForm" class="grid-form">
+                <input id="adminPricingDuration" class="input" type="number" min="0.5" step="0.5" placeholder="Duration hours" />
+                <input id="adminPricingPrice" class="input" type="number" min="1" placeholder="Weekday price" />
+                <input id="adminPricingWeekend" class="input" type="number" min="1" placeholder="Weekend price" />
+                <button class="primary-btn full-span" type="submit">Save Pricing</button>
+              </form>
+              <div id="adminPricingList" class="list-stack compact-stack top-gap"></div>
+
+              <div class="panel-divider"></div>
+
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">SLOTS</p>
+                  <h2>Slot Management</h2>
+                </div>
+                <input id="adminSlotsDate" class="input narrow" type="date" />
+              </div>
+              <div class="action-row">
+                <button id="adminGenerateSlotsBtn" class="primary-btn" type="button">Generate Hourly Slots</button>
+                <button id="adminReloadSlotsBtn" class="ghost-btn" type="button">Reload Slots</button>
+              </div>
+              <div id="adminSlotsList" class="list-stack compact-stack top-gap"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">ADMIN BOOKINGS</p>
+                  <h2>Booking Queue</h2>
+                </div>
+              </div>
+              <div id="adminBookingsList" class="list-stack"></div>
+
+              <div class="panel-divider"></div>
+
+              <div id="adminBookingDetailEmpty" class="empty-block">
+                <p>Select an admin booking to review status and next actions.</p>
+              </div>
+              <div id="adminBookingDetail" class="hidden">
+                <div id="adminBookingSummary" class="info-card"></div>
+                <div class="action-row top-gap">
+                  <button id="adminConfirmBookingBtn" class="primary-btn" type="button">Confirm</button>
+                  <button id="adminCompleteBookingBtn" class="ghost-btn" type="button">Complete</button>
+                  <button id="adminCancelBookingBtn" class="ghost-btn danger" type="button">Cancel</button>
+                </div>
+              </div>
+
+              <div class="panel-divider"></div>
+
+              <h3>Payout Profile</h3>
+              <form id="adminPayoutForm" class="grid-form">
+                <input id="adminPayoutHolder" class="input" type="text" placeholder="Account holder name" />
+                <input id="adminPayoutUpi" class="input" type="text" placeholder="UPI ID" />
+                <input id="adminPayoutBank" class="input" type="text" placeholder="Bank name" />
+                <input id="adminPayoutAccount" class="input" type="text" placeholder="Bank account number" />
+                <input id="adminPayoutIfsc" class="input" type="text" placeholder="IFSC code" />
+                <input id="adminPayoutBranch" class="input" type="text" placeholder="Branch name" />
+                <input id="adminPayoutBeneficiary" class="input" type="text" placeholder="Beneficiary code" />
+                <button class="ghost-btn full-span" type="submit">Save Payout Profile</button>
+              </form>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
