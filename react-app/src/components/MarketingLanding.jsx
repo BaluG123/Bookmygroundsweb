@@ -1,8 +1,9 @@
 import React from 'react';
-import footballImg from '../assets/hero_landing.png';
+import footballImg from '../assets/box_football.png';
 import cricketImg from '../assets/cricket_turf.png';
 import badmintonImg from '../assets/badminton_court.png';
 import ownerAppImg from '../assets/owner_app.png';
+import qrImg from '../assets/app_qr.png';
 
 const MarketingLanding = () => {
   const playStoreLink = "https://play.google.com/store/apps/details?id=com.bookmygrounds";
@@ -26,11 +27,17 @@ const MarketingLanding = () => {
             Whether it's a midnight football match or an early morning cricket game, 
             book premium arenas across Bengaluru in under 60 seconds.
           </p>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
-            <a href={playStoreLink} target="_blank" rel="noopener noreferrer" className="btn-primary">
-              Download Now
-            </a>
-            <a href="#owners" className="btn-outline">For Ground Owners</a>
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <a href={playStoreLink} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                Download Now
+              </a>
+              <a href="#owners" className="btn-outline">For Ground Owners</a>
+            </div>
+            <div className="qr-container">
+              <img src={qrImg} alt="Scan to Install" />
+              <span>Scan to Install App</span>
+            </div>
           </div>
         </div>
         <div className="hero-visual">
