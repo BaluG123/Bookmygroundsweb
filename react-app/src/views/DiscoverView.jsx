@@ -10,6 +10,7 @@ import {
   resolveMatchingPricingPlan,
   today,
 } from '../api';
+import ImageGallery from '../components/ImageGallery';
 
 export default function DiscoverView({
   grounds, loadGrounds, favorites, setFavorites,
@@ -227,7 +228,28 @@ export default function DiscoverView({
               <div
                 className="ground-card-media"
                 style={{ backgroundImage: `url('${imageForGround(ground)}')` }}
-              />
+              >
+                {ground.images && ground.images.length > 1 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 8,
+                      right: 8,
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      color: 'white',
+                      padding: '4px 8px',
+                      borderRadius: '12px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    📷 {ground.images.length}
+                  </div>
+                )}
+              </div>
               <div className="ground-card-body">
                 <p className="kicker">
                   {ground.ground_type_display || ground.ground_type || 'Ground'}
@@ -261,16 +283,29 @@ export default function DiscoverView({
           </div>
         ) : (
           <div className="fade-in">
-            {/* Hero image */}
-            <div
-              className="detail-hero"
-              style={{ backgroundImage: `url('${imageForGround(detail)}')` }}
-            >
-              <div className="detail-hero-content">
-                <p className="kicker">{detail.city || 'BookMyGrounds'}</p>
-                <h2>{detail.name}</h2>
-                <p>{[detail.address, detail.city, detail.state].filter(Boolean).join(', ')}</p>
+            {/* Image Gallery */}
+            {detail.images && detail.images.length > 0 ? (
+              <ImageGallery images={detail.images} groundName={detail.name} />
+            ) : (
+              <div
+                className="detail-hero"
+                style={{ backgroundImage: `url('${imageForGround(detail)}')` }}
+              >
+                <div className="detail-hero-content">
+                  <p className="kicker">{detail.city || 'BookMyGrounds'}</p>
+                  <h2>{detail.name}</h2>
+                  <p>{[detail.address, detail.city, detail.state].filter(Boolean).join(', ')}</p>
+                </div>
               </div>
+            )}
+
+            {/* Ground Info Header */}
+            <div style={{ marginBottom: 16 }}>
+              <p className="kicker">{detail.city || 'BookMyGrounds'}</p>
+              <h2 style={{ marginTop: 8, marginBottom: 8 }}>{detail.name}</h2>
+              <p style={{ color: 'var(--text-secondary)' }}>
+                {[detail.address, detail.city, detail.state].filter(Boolean).join(', ')}
+              </p>
             </div>
 
             {/* Actions */}

@@ -10,6 +10,7 @@ export default function AccountView({ token, user, onLogin, onRegister, onLogout
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regCity, setRegCity] = useState('');
+  const [regRole, setRegRole] = useState('customer');
   const [regPassword, setRegPassword] = useState('');
   const [regPasswordConfirm, setRegPasswordConfirm] = useState('');
   const [regBusy, setRegBusy] = useState(false);
@@ -50,13 +51,13 @@ export default function AccountView({ token, user, onLogin, onRegister, onLogout
         email: regEmail,
         phone: regPhone,
         city: regCity,
-        role: 'customer',
+        role: regRole,
         state: '',
         password: regPassword,
         password_confirm: regPasswordConfirm,
       });
       setRegName(''); setRegEmail(''); setRegPhone('');
-      setRegCity(''); setRegPassword(''); setRegPasswordConfirm('');
+      setRegCity(''); setRegRole('customer'); setRegPassword(''); setRegPasswordConfirm('');
     } catch (err) {
       notify(err.message, true);
     } finally {
@@ -143,8 +144,63 @@ export default function AccountView({ token, user, onLogin, onRegister, onLogout
             </form>
 
             <details className="details-block">
-              <summary>Create customer account</summary>
+              <summary>Create new account</summary>
               <form className="form-grid" style={{ marginTop: 14 }} onSubmit={handleRegisterSubmit}>
+                <div className="full-span" style={{ marginBottom: 12 }}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: '0.9rem', fontWeight: 600 }}>
+                    I am a:
+                  </label>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <label
+                      style={{
+                        flex: 1,
+                        padding: '12px',
+                        border: regRole === 'customer' ? '2px solid var(--accent)' : '2px solid var(--border)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        background: regRole === 'customer' ? 'var(--accent-subtle)' : 'transparent',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value="customer"
+                        checked={regRole === 'customer'}
+                        onChange={(e) => setRegRole(e.target.value)}
+                        style={{ marginRight: 8 }}
+                      />
+                      <strong>Player</strong>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0 24px' }}>
+                        Book grounds and play
+                      </p>
+                    </label>
+                    <label
+                      style={{
+                        flex: 1,
+                        padding: '12px',
+                        border: regRole === 'admin' ? '2px solid var(--accent)' : '2px solid var(--border)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        background: regRole === 'admin' ? 'var(--accent-subtle)' : 'transparent',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value="admin"
+                        checked={regRole === 'admin'}
+                        onChange={(e) => setRegRole(e.target.value)}
+                        style={{ marginRight: 8 }}
+                      />
+                      <strong>Ground Owner</strong>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0 24px' }}>
+                        Manage and rent grounds
+                      </p>
+                    </label>
+                  </div>
+                </div>
                 <input className="input" type="text" placeholder="Full name" required value={regName} onChange={(e) => setRegName(e.target.value)} />
                 <input className="input" type="email" placeholder="Email" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
                 <input className="input" type="tel" placeholder="Phone" value={regPhone} onChange={(e) => setRegPhone(e.target.value)} />
@@ -152,7 +208,7 @@ export default function AccountView({ token, user, onLogin, onRegister, onLogout
                 <input className="input" type="password" placeholder="Password" required value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
                 <input className="input" type="password" placeholder="Confirm password" required value={regPasswordConfirm} onChange={(e) => setRegPasswordConfirm(e.target.value)} />
                 <button className="btn btn-ghost full-span" type="submit" disabled={regBusy}>
-                  {regBusy ? 'Creating...' : 'Register'}
+                  {regBusy ? 'Creating...' : `Register as ${regRole === 'admin' ? 'Ground Owner' : 'Player'}`}
                 </button>
               </form>
             </details>
@@ -160,10 +216,15 @@ export default function AccountView({ token, user, onLogin, onRegister, onLogout
         ) : (
           <div>
             <div className="profile-card">
-              <strong>{user.full_name || 'Customer'}</strong>
+              <strong>{user.full_name || 'User'}</strong>
               <p>📧 {user.email || ''}</p>
               <p>📍 {user.city || 'City not set'}</p>
-              <p>👤 Role: {user.role || 'customer'}</p>
+              <p>
+                👤 {user.role === 'admin' ? '🏟️ Ground Owner' : '⚽ Player'} 
+                <span style={{ marginLeft: 8, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  ({user.role || 'customer'})
+                </span>
+              </p>
             </div>
             <button className="btn btn-danger" style={{ marginTop: 16 }} onClick={onLogout}>
               Logout

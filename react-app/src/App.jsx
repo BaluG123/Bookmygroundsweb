@@ -24,6 +24,17 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('Discover');
   const [token, setTokenState] = useState(getToken());
   const [user, setUserState] = useState(getUser());
+  
+  // Filter tabs based on user role
+  const visibleTabs = TABS.filter(tab => {
+    if (tab === 'Admin') {
+      return user?.role === 'admin' || user?.is_staff;
+    }
+    if (tab === 'Customer') {
+      return user?.role === 'customer' || user?.role === 'admin' || user?.is_staff;
+    }
+    return true;
+  });
   const [grounds, setGrounds] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -119,7 +130,7 @@ export default function App() {
         bookingsCount={bookings.length}
       />
 
-      <TabBar tabs={TABS} active={activeTab} onChange={setActiveTab} />
+      <TabBar tabs={visibleTabs} active={activeTab} onChange={setActiveTab} />
 
       <main>
         <div className={`view ${activeTab === 'Discover' ? 'active' : ''}`}>

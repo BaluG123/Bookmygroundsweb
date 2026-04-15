@@ -30,6 +30,7 @@ export default function AdminView({ token, user, notify }) {
   const [groundImages, setGroundImages] = useState([]);
 
   const [pricingActive, setPricingActive] = useState([]);
+  const [pDurationType, setPDurationType] = useState('per_hour');
   const [pDuration, setPDuration] = useState('');
   const [pPrice, setPPrice] = useState('');
   const [pWeekend, setPWeekend] = useState('');
@@ -194,12 +195,13 @@ export default function AdminView({ token, user, notify }) {
 
     try {
       await groundsAPI.addPricing(groundId, {
-        ground: groundId,
-        duration_hours: pDuration,
-        price: pPrice,
-        weekend_price: pWeekend || null,
+        duration_type: pDurationType,
+        duration_hours: parseFloat(pDuration),
+        price: parseFloat(pPrice),
+        weekend_price: pWeekend ? parseFloat(pWeekend) : null,
         is_active: true,
       });
+      setPDurationType('per_hour');
       setPDuration('');
       setPPrice('');
       setPWeekend('');
@@ -516,7 +518,40 @@ export default function AdminView({ token, user, notify }) {
               {!groundId && <p className="status-text">Select or create a ground to enable pricing.</p>}
 
               <form className="list-stack" style={{ marginTop: 10 }} onSubmit={handlePricingSave}>
-                <input className="input" type="number" step="0.5" placeholder="Duration hours" value={pDuration} onChange={(e) => setPDuration(e.target.value)} required />
+                <select 
+                  className="input" 
+                  value={pDurationType} 
+                  onChange={(e) => {
+                    setPDurationType(e.target.value);
+                    // Auto-fill duration hours based on type
+                    const durationMap = {
+                      'per_hour': '1',
+                      'two_hours': '2',
+                      'three_hours': '3',
+                      'half_day': '4',
+                      'full_day': '8',
+                      'custom': ''
+                    };
+                    setPDuration(durationMap[e.target.value] || '');
+                  }}
+                  required
+                >
+                  <option value="per_hour">Per Hour (1 hr)</option>
+                  <option value="two_hours">Two Hours (2 hrs)</option>
+                  <option value="three_hours">Three Hours (3 hrs)</option>
+                  <option value="half_day">Half Day (4 hrs)</option>
+                  <option value="full_day">Full Day (8 hrs)</option>
+                  <option value="custom">Custom Duration</option>
+                </select>
+                <input 
+                  className="input" 
+                  type="number" 
+                  step="0.5" 
+                  placeholder="Duration hours" 
+                  value={pDuration} 
+                  onChange={(e) => setPDuration(e.target.value)} 
+                  required 
+                />
                 <input className="input" type="number" placeholder="Weekday price" value={pPrice} onChange={(e) => setPPrice(e.target.value)} required />
                 <input className="input" type="number" placeholder="Weekend price (opt)" value={pWeekend} onChange={(e) => setPWeekend(e.target.value)} />
                 <button className="btn btn-ghost" type="submit" disabled={!groundId}>Add Pricing</button>
@@ -532,9 +567,27 @@ export default function AdminView({ token, user, notify }) {
 
                 {pricingActive.map((p) => (
                   <div key={p.id} className="pricing-item">
-                    <strong>{p.duration_hours} hrs</strong>
+                    <strong>{p.duration_display || `${p.duration_hours} hrs`}</strong>
                     <p>Weekday: ₹{p.price}</p>
                     <p>{p.weekend_price ? `Weekend: ₹${p.weekend_price}` : 'Weekend uses standard rate.'}</p>
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      style={{ marginTop: 8, fontSize: '0.75rem', padding: '4px 8px' }}
+                      onClick={async () => {
+                        if (window.confirm('Delete this pricing plan?')) {
+                          try {
+                            await groundsAPI.deletePricing(groundId, p.id);
+                            notify('Pricing plan deleted');
+                            await selectGround(groundId);
+                          } catch (err) {
+                            notify(err.message, true);
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
                   </div>
                 ))}
               </div>
