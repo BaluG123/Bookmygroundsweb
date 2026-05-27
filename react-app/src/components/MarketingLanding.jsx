@@ -465,6 +465,63 @@ const MarketingLanding = () => {
         </div>
       </section>
 
+      {/* Install the App Section */}
+      <section className="install-app-section landing-container">
+        <div className="install-app-card">
+          <div className="install-left">
+            <div className="install-badge">
+              <span>📲</span> GET THE APP
+            </div>
+            <h2>Your Game. Your Ground. One Tap Away.</h2>
+            <p>
+              Download BookMyGrounds and never miss a slot again. Instant booking, real-time availability, and secure payments — all from your pocket.
+            </p>
+            <div className="install-features">
+              <div className="install-feature">
+                <div className="install-feature-icon">⚡</div>
+                <span>Instant Booking</span>
+              </div>
+              <div className="install-feature">
+                <div className="install-feature-icon">🔒</div>
+                <span>Secure Payments</span>
+              </div>
+              <div className="install-feature">
+                <div className="install-feature-icon">📍</div>
+                <span>Nearby Grounds</span>
+              </div>
+            </div>
+            <div className="install-actions">
+              <a href={playStoreLink} target="_blank" rel="noopener noreferrer" className="btn-primary glow-btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.05rem' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Install Free on Android
+              </a>
+            </div>
+          </div>
+          <div className="install-right">
+            <div className="install-phone-glow">
+              <div className="install-floating-badge top-right">⚡ 60s Booking</div>
+              <div className="install-floating-badge bottom-left">★ 4.8 Rating</div>
+              <div className="install-phone">
+                <div className="install-phone-screen">
+                  <div className="install-phone-logo">BOOK<span>MYGROUNDS</span></div>
+                  <div className="install-phone-sports">
+                    <span>⚽</span><span>🏏</span><span>🏸</span><span>🏀</span>
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: '#94a3b8', lineHeight: 1.4 }}>
+                    Book premium sports arenas in under 60 seconds
+                  </div>
+                  <div className="install-phone-cta">Get Started</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="cta-footer landing-container">
         <h2>Ready to Level Up?</h2>
         <p style={{ marginBottom: '3rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto 3rem' }}>
